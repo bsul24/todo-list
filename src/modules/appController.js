@@ -1,1 +1,1 @@
-export const test = "test"
+import Project from "./Project.js";
