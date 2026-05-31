@@ -1,24 +1,27 @@
 import "./styles.css"
-import Project from "./modules/Project.js"
-import Todo from "./modules/Todo.js"
+import { getProjects, getCurrentProject, setCurrentProject, addProject, addTodoToCurrentProject, deleteTodoFromCurrentProject, findTodoInCurrentProject } from "./modules/appController.js"
 
-const proj = new Project("Test")
-const todo1 = new Todo(
-  "Test todo",
-  "Testing todos and all that such",
-  "2026-06-02",
-  "High"
+// console.log(getProjects())
+// console.log(getCurrentProject())
+addTodoToCurrentProject(
+  "Test Todo",
+  "Testing todos and such yayayayayayay",
+  "2026-06-13",
+  "High" 
 )
-const todo2 = new Todo(
-  "Another Test todo",
-  "Testing more todos and all that such",
-  "2026-06-05",
+// console.log(getCurrentProject())
+addProject("Test Project 1")
+setCurrentProject(getProjects()[1].id)
+// console.log(getCurrentProject())
+const newTodo = addTodoToCurrentProject(
+  "Another test todo",
+  "Testing adding another todo to another new project",
+  "2026-07-01",
   "Medium"
 )
-
-proj.addTodo(todo1)
-proj.addTodo(todo2)
-console.log(proj)
-proj.removeTodo(todo1.id)
-console.log(proj)
-console.log(proj.findTodo(todo2.id))
+const todoId = newTodo.id
+console.log(todoId)
+console.log(getCurrentProject())
+console.log(findTodoInCurrentProject(todoId))
+deleteTodoFromCurrentProject(todoId)
+console.log(getCurrentProject())
