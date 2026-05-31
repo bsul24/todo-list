@@ -7,3 +7,8 @@
 body {
   background-color: pink;
 }
+
+.active-project {
+  border: 2px solid black;
+  background-color: green;
+}

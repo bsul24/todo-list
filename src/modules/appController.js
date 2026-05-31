@@ -40,5 +40,3 @@ export function findTodoInCurrentProject(todoId) {
   return getCurrentProject().findTodo(todoId)
 }
 
-addProject("Default Project")
-setCurrentProject(projects[0].id)

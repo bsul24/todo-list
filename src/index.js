@@ -1,27 +1,24 @@
 import "./styles.css"
-import { getProjects, getCurrentProject, setCurrentProject, addProject, addTodoToCurrentProject, deleteTodoFromCurrentProject, findTodoInCurrentProject } from "./modules/appController.js"
+import { setCurrentProject, addProject, addTodoToCurrentProject } from "./modules/appController.js"
+import { render, initDOMEvents } from "./modules/domController.js"
 
-// console.log(getProjects())
-// console.log(getCurrentProject())
+const defaultProject = addProject("Default Project")
+setCurrentProject(defaultProject.id)
 addTodoToCurrentProject(
-  "Test Todo",
-  "Testing todos and such yayayayayayay",
-  "2026-06-13",
-  "High" 
+  "Default todo",
+  "Testing out todos and such",
+  "2026-06-05",
+  "High"
 )
-// console.log(getCurrentProject())
-addProject("Test Project 1")
-setCurrentProject(getProjects()[1].id)
-// console.log(getCurrentProject())
-const newTodo = addTodoToCurrentProject(
-  "Another test todo",
-  "Testing adding another todo to another new project",
-  "2026-07-01",
-  "Medium"
+const newProject = addProject("Test Project 1")
+setCurrentProject(newProject.id)
+addTodoToCurrentProject(
+  "Test todo",
+  "todo tests test todo all that and such ayayayayyaya",
+  "2026-06-23",
+  "Low"
 )
-const todoId = newTodo.id
-console.log(todoId)
-console.log(getCurrentProject())
-console.log(findTodoInCurrentProject(todoId))
-deleteTodoFromCurrentProject(todoId)
-console.log(getCurrentProject())
+setCurrentProject(defaultProject.id)
+
+initDOMEvents()
+render()
