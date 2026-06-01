@@ -40,3 +40,7 @@ export function findTodoInCurrentProject(todoId) {
   return getCurrentProject().findTodo(todoId)
 }
 
+export function toggleTodoCompleteInCurrentProject(todoId) {
+  getCurrentProject().toggleTodoComplete(todoId)
+}
+

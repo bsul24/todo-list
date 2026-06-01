@@ -21,4 +21,8 @@ export default class Project {
   findTodo(todoId) {
     return this.todos.find(todo => todo.id === todoId)
   }
+
+  toggleTodoComplete(todoId) {
+    this.findTodo(todoId).toggleComplete()
+  }
 }
