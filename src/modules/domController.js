@@ -1,10 +1,12 @@
-import { getProjects, getCurrentProject, setCurrentProject, addTodoToCurrentProject, deleteTodoFromCurrentProject, toggleTodoCompleteInCurrentProject } from "./appController.js"
+import { getProjects, getCurrentProject, setCurrentProject, addTodoToCurrentProject, deleteTodoFromCurrentProject, toggleTodoCompleteInCurrentProject, addProject, deleteProject } from "./appController.js"
 
 const projectsContainer = document.querySelector(".projects-container")
 const currentProjectTitle = document.querySelector(".cur-proj-title")
 const todosContainer = document.querySelector(".todos-container")
 const newTodoBtn = document.querySelector(".new-todo-btn")
 const todosFormContainer = document.querySelector(".todos-form-container")
+const newProjectBtn = document.querySelector(".new-proj-btn")
+const projectFormContainer = document.querySelector(".project-form-container")
 
 function renderProjects() {
   const projects = getProjects()
@@ -12,7 +14,10 @@ function renderProjects() {
   projectsContainer.textContent = ""
   projects.forEach(proj => {
     const html = `
-      <button data-project-id="${proj.id}"${proj.id === curProject.id ? ' class="active-project"' : ""}>${proj.name}</button>
+      <div class="project-item ${proj.id === curProject.id ? "active-project" : ""}" data-project-id="${proj.id}">
+        <button class="project-select-btn" type="button">${proj.name}</button>
+        <button class="project-delete-btn" type="button">Delete</button>
+      </div>
     `
     projectsContainer.innerHTML += html
   })
@@ -33,7 +38,7 @@ function renderTodos() {
         <p class="todo-due-date">${todo.dueDate}</p>
         <p class="todo-priority">${todo.priority}</p>
         <p class="todo-status">${todo.completed ? "Completed" : "In Progress"}</p> 
-        <input class="todo-complete-checkbox" type="checkbox" ${todo.completed ? "checked" : ""}>
+        <input class="todo-complete-checkbox" type="checkbox" aria-label="Mark todo complete" ${todo.completed ? "checked" : ""}>
         <button class="delete-todo-btn" type="button">Delete</button>
       </div>
     `
@@ -75,9 +80,39 @@ function handleFormSubmit(e) {
   render()
 }
 
+function handleNewProjectClick() {
+  projectFormContainer.innerHTML = `
+    <form action="" class="new-project-form">
+      <label for="project-name">Project Name</label>
+      <input type="text" name="project-name" id="project-name" required>
+      <button class="submit-project-btn" type="submit">Submit</button>
+      <button class="cancel-project-btn" type="button">Cancel</button>
+    </form>
+  `
+}
+
+function handleNewProjectFormSubmit(e) {
+  e.preventDefault()
+  const form = e.target
+  const formData = new FormData(form)
+  const projectName = formData.get("project-name")
+  projectFormContainer.textContent = ""
+  setCurrentProject(addProject(projectName).id)
+  render()
+}
+
+function handleProjectFormCancel(e) {
+  if (e.target.classList.contains("cancel-project-btn")) {
+    projectFormContainer.textContent = ""
+  }
+}
+
 function handleProjectClick(e) {
-  if (e.target.dataset.projectId) {
-    setCurrentProject(e.target.dataset.projectId)
+  if (e.target.classList.contains("project-select-btn")) {
+    setCurrentProject(e.target.closest(".project-item").dataset.projectId)
+    render()
+  } else if (e.target.classList.contains("project-delete-btn")) {
+    deleteProject(e.target.closest(".project-item").dataset.projectId)
     render()
   }
 }
@@ -115,4 +150,7 @@ export function initDOMEvents() {
   todosFormContainer.addEventListener("click", handleTodoFormCancel)
   todosContainer.addEventListener("click", handleTodoDeleteClick)
   todosContainer.addEventListener("click", handleTodoCheckboxClick)
+  newProjectBtn.addEventListener("click", handleNewProjectClick)
+  projectFormContainer.addEventListener("submit", handleNewProjectFormSubmit)
+  projectFormContainer.addEventListener("click", handleProjectFormCancel)
 }

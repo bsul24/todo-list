@@ -24,6 +24,23 @@ export function addProject(name) {
   return newProject
 }
 
+export function deleteProject(projectId) {
+  if (projects.length < 2) {
+    return
+  }
+
+  const projectIndex = projects.findIndex(proj => proj.id === projectId)
+  if (projectIndex >= 0) {
+    projects.splice(projectIndex, 1)
+    if (projectId === currentProjectId) {
+      setCurrentProject(projects[0].id)
+    }
+    return true
+  }
+  return false
+  
+}
+
 export function addTodoToCurrentProject(title, description, dueDate, priority) {
   const curProject = getCurrentProject()
   const newTodo = new Todo(title, description, dueDate, priority)
