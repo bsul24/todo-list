@@ -10,6 +10,8 @@ const newProjectBtn = document.querySelector(".new-proj-btn")
 const projectFormContainer = document.querySelector(".project-form-container")
 let expandedTodoId = null
 let editingTodoId = null
+let confirmingDeleteTodoId = null
+let confirmingDeleteProjectId = null
 
 function renderProjects() {
   const projects = getProjects()
@@ -19,7 +21,15 @@ function renderProjects() {
     const html = `
       <div class="project-item ${proj.id === curProject.id ? "active-project" : ""}" data-project-id="${proj.id}">
         <button class="project-select-btn" type="button">${proj.name}</button>
-        <button class="project-delete-btn" type="button">Delete</button>
+        ${confirmingDeleteProjectId === proj.id ? 
+          `
+            <p class="confirm-delete-project-text">Delete this project?</p>
+            <button class="confirm-delete-project-btn" type="button">Yes</button>
+            <button class="cancel-delete-project-btn" type="button">Cancel</button>
+          `
+          : projects.length > 1 ? `<button class="project-delete-btn" type="button">Delete</button>`
+          : ""
+        }
       </div>
     `
     projectsContainer.innerHTML += html
@@ -69,7 +79,15 @@ function renderTodos() {
         <p class="todo-status">${todo.completed ? "Completed" : "In Progress"}</p> 
         <input class="todo-complete-checkbox" type="checkbox" aria-label="Mark todo complete" ${todo.completed ? "checked" : ""}>
         <button class="todo-details-btn" type="button">${todo.id === expandedTodoId ? "Hide Details" : "Details"}</button>
-        ${expandedTodoId === todo.id ? `<button class="delete-todo-btn" type="button">Delete</button>` : ""}
+        ${confirmingDeleteTodoId === todo.id ? 
+          `
+            <p class="confirm-delete-todo-text">Are you sure?</p>
+            <button class="confirm-delete-todo-btn" type="button">Yes, delete</button>
+            <button class="cancel-delete-todo-btn" type="button">Cancel</button>
+          ` : expandedTodoId === todo.id ?
+          `<button class="delete-todo-btn" type="button">Delete</button>`
+          : ""
+        }
         ${expandedTodoId === todo.id ? `<button class="edit-todo-btn" type="button">Edit</button>` : ""}
       </div>
     `
@@ -110,6 +128,8 @@ function handleFormSubmit(e) {
   addTodoToCurrentProject(title, description, dueDate, priority)
   expandedTodoId = null
   editingTodoId = null
+  confirmingDeleteTodoId = null
+  confirmingDeleteProjectId = null
   render()
 }
 
@@ -133,6 +153,8 @@ function handleNewProjectFormSubmit(e) {
   setCurrentProject(addProject(projectName).id)
   expandedTodoId = null
   editingTodoId = null
+  confirmingDeleteTodoId = null
+  confirmingDeleteProjectId = null
   render()
 }
 
@@ -147,11 +169,23 @@ function handleProjectClick(e) {
     setCurrentProject(e.target.closest(".project-item").dataset.projectId)
     expandedTodoId = null
     editingTodoId = null
+    confirmingDeleteTodoId = null
+    confirmingDeleteProjectId = null
     render()
   } else if (e.target.classList.contains("project-delete-btn")) {
-    deleteProject(e.target.closest(".project-item").dataset.projectId)
+    const curProjectId = e.target.closest(".project-item").dataset.projectId
+    confirmingDeleteProjectId = curProjectId
+    render()
+  } else if (e.target.classList.contains("confirm-delete-project-btn")) {
+    const curProjectId = e.target.closest(".project-item").dataset.projectId
+    deleteProject(curProjectId)
+    confirmingDeleteProjectId = null
     expandedTodoId = null
     editingTodoId = null
+    confirmingDeleteTodoId = null
+    render()
+  } else if (e.target.classList.contains("cancel-delete-project-btn")) {
+    confirmingDeleteProjectId = null
     render()
   }
 }
@@ -164,25 +198,44 @@ function handleTodoFormCancel(e) {
 
 function handleTodoClick(e) {
   if (e.target.classList.contains("delete-todo-btn")) {
-    deleteTodoFromCurrentProject(e.target.closest(".todo-card").dataset.todoId)
-    expandedTodoId = null
-    editingTodoId = null
+    const curTodoId = e.target.closest(".todo-card").dataset.todoId
+    confirmingDeleteTodoId = curTodoId
     render()
   } else if (e.target.classList.contains("todo-complete-checkbox")) {
     toggleTodoCompleteInCurrentProject(e.target.closest(".todo-card").dataset.todoId)
+    confirmingDeleteTodoId = null
     render()
   } else if (e.target.classList.contains("todo-details-btn")) {
     if (e.target.closest(".todo-card").dataset.todoId === expandedTodoId) {
       expandedTodoId = null
+      editingTodoId = null
+      confirmingDeleteTodoId = null
+      confirmingDeleteProjectId = null
     } else {
       expandedTodoId = e.target.closest(".todo-card").dataset.todoId
+      confirmingDeleteTodoId = null
+      confirmingDeleteProjectId = null
     }
     render()
   } else if (e.target.classList.contains("edit-todo-btn")) {
     editingTodoId = expandedTodoId
+    confirmingDeleteProjectId = null
+    confirmingDeleteTodoId = null
     render()
   } else if (e.target.classList.contains("cancel-update-todo-btn")) {
     editingTodoId = null
+    render()
+  } else if (e.target.classList.contains("confirm-delete-todo-btn")) {
+    const curTodoId = e.target.closest(".todo-card").dataset.todoId
+    deleteTodoFromCurrentProject(curTodoId)
+    confirmingDeleteTodoId = null
+    expandedTodoId = null
+    editingTodoId = null
+    confirmingDeleteProjectId = null
+    render()
+  } else if (e.target.classList.contains("cancel-delete-todo-btn")) {
+    confirmingDeleteTodoId = null
+    confirmingDeleteProjectId = null
     render()
   }
 }
