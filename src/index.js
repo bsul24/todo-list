@@ -8,7 +8,7 @@ addTodoToCurrentProject(
   "Default todo",
   "Testing out todos and such",
   "2026-06-05",
-  "High"
+  "high"
 )
 const newProject = addProject("Test Project 1")
 setCurrentProject(newProject.id)
@@ -16,7 +16,7 @@ addTodoToCurrentProject(
   "Test todo",
   "todo tests test todo all that and such ayayayayyaya",
   "2026-06-23",
-  "Low"
+  "low"
 )
 setCurrentProject(defaultProject.id)
 

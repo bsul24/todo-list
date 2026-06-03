@@ -61,3 +61,6 @@ export function toggleTodoCompleteInCurrentProject(todoId) {
   getCurrentProject().toggleTodoComplete(todoId)
 }
 
+export function updateTodoInCurrentProject(todoId, title, description, dueDate, priority) {
+  getCurrentProject().updateTodo(todoId, title, description, dueDate, priority)
+}

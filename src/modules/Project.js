@@ -25,4 +25,8 @@ export default class Project {
   toggleTodoComplete(todoId) {
     this.findTodo(todoId).toggleComplete()
   }
+
+  updateTodo(todoId, title, description, dueDate, priority) {
+    this.findTodo(todoId)?.updateDetails(title, description, dueDate, priority)
+  }
 }

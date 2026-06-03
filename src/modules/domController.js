@@ -1,4 +1,4 @@
-import { getProjects, getCurrentProject, setCurrentProject, addTodoToCurrentProject, deleteTodoFromCurrentProject, toggleTodoCompleteInCurrentProject, addProject, deleteProject } from "./appController.js"
+import { getProjects, getCurrentProject, setCurrentProject, addTodoToCurrentProject, deleteTodoFromCurrentProject, toggleTodoCompleteInCurrentProject, addProject, deleteProject, updateTodoInCurrentProject } from "./appController.js"
 
 const projectsContainer = document.querySelector(".projects-container")
 const currentProjectTitle = document.querySelector(".cur-proj-title")
@@ -7,6 +7,8 @@ const newTodoBtn = document.querySelector(".new-todo-btn")
 const todosFormContainer = document.querySelector(".todos-form-container")
 const newProjectBtn = document.querySelector(".new-proj-btn")
 const projectFormContainer = document.querySelector(".project-form-container")
+let expandedTodoId = null
+let editingTodoId = null
 
 function renderProjects() {
   const projects = getProjects()
@@ -32,14 +34,42 @@ function renderTodos() {
   const curProject = getCurrentProject()
   todosContainer.textContent = ""
   curProject.todos.forEach(todo => {
-    const html = `
-      <div class="todo-card" data-todo-id="${todo.id}">
+    const html = editingTodoId === todo.id ? 
+    `
+    <div class="todo-card ${todo.priority === "low" ? "low-priority" : 
+                              todo.priority === "medium" ? "medium-priority" : "high-priority"
+      }" data-todo-id="${todo.id}">
+        <form action="" class="edit-todo-form">
+          <label for="new-title">Title</label>
+          <input type="text" name="new-title" id="new-title" value="${todo.title}" required>
+          <label for="new-description">Description</label>
+          <textarea name="new-description" id="new-description" required>${todo.description}</textarea>
+          <label for="new-due-date">Due Date</label>
+          <input type="date" name="new-due-date" id="new-due-date" value="${todo.dueDate}" required>
+          <label for="new-priority">Priority</label>
+          <select name="new-priority" id="new-priority">
+            <option value="low" ${todo.priority === "low" ? "selected" : ""}>Low</option>
+            <option value="medium" ${todo.priority === "medium" ? "selected" : ""}>Medium</option>
+            <option value="high" ${todo.priority === "high" ? "selected" : ""}>High</option>
+          </select>
+          <button class="submit-update-todo-btn" type="submit">Submit</button>
+          <button class="cancel-update-todo-btn" type="button">Cancel</button>
+        </form>
+      </div>
+    `
+    :
+    `
+      <div class="todo-card ${todo.priority === "low" ? "low-priority" : 
+                              todo.priority === "medium" ? "medium-priority" : "high-priority"
+      }" data-todo-id="${todo.id}">
         <h3 class="todo-title">${todo.title}</h3>
+        ${expandedTodoId === todo.id ? `<p class="todo-description">${todo.description}</p>` : ""}
         <p class="todo-due-date">${todo.dueDate}</p>
-        <p class="todo-priority">${todo.priority}</p>
         <p class="todo-status">${todo.completed ? "Completed" : "In Progress"}</p> 
         <input class="todo-complete-checkbox" type="checkbox" aria-label="Mark todo complete" ${todo.completed ? "checked" : ""}>
-        <button class="delete-todo-btn" type="button">Delete</button>
+        <button class="todo-details-btn" type="button">${todo.id === expandedTodoId ? "Hide Details" : "Details"}</button>
+        ${expandedTodoId === todo.id ? `<button class="delete-todo-btn" type="button">Delete</button>` : ""}
+        ${expandedTodoId === todo.id ? `<button class="edit-todo-btn" type="button">Edit</button>` : ""}
       </div>
     `
     todosContainer.innerHTML += html
@@ -77,6 +107,8 @@ function handleFormSubmit(e) {
   const priority = formData.get("priority")
   todosFormContainer.textContent = ""
   addTodoToCurrentProject(title, description, dueDate, priority)
+  expandedTodoId = null
+  editingTodoId = null
   render()
 }
 
@@ -98,6 +130,8 @@ function handleNewProjectFormSubmit(e) {
   const projectName = formData.get("project-name")
   projectFormContainer.textContent = ""
   setCurrentProject(addProject(projectName).id)
+  expandedTodoId = null
+  editingTodoId = null
   render()
 }
 
@@ -110,9 +144,13 @@ function handleProjectFormCancel(e) {
 function handleProjectClick(e) {
   if (e.target.classList.contains("project-select-btn")) {
     setCurrentProject(e.target.closest(".project-item").dataset.projectId)
+    expandedTodoId = null
+    editingTodoId = null
     render()
   } else if (e.target.classList.contains("project-delete-btn")) {
     deleteProject(e.target.closest(".project-item").dataset.projectId)
+    expandedTodoId = null
+    editingTodoId = null
     render()
   }
 }
@@ -123,18 +161,47 @@ function handleTodoFormCancel(e) {
   }
 }
 
-function handleTodoDeleteClick(e) {
+function handleTodoClick(e) {
   if (e.target.classList.contains("delete-todo-btn")) {
     deleteTodoFromCurrentProject(e.target.closest(".todo-card").dataset.todoId)
+    expandedTodoId = null
+    editingTodoId = null
+    render()
+  } else if (e.target.classList.contains("todo-complete-checkbox")) {
+    toggleTodoCompleteInCurrentProject(e.target.closest(".todo-card").dataset.todoId)
+    render()
+  } else if (e.target.classList.contains("todo-details-btn")) {
+    if (e.target.closest(".todo-card").dataset.todoId === expandedTodoId) {
+      expandedTodoId = null
+    } else {
+      expandedTodoId = e.target.closest(".todo-card").dataset.todoId
+    }
+    render()
+  } else if (e.target.classList.contains("edit-todo-btn")) {
+    editingTodoId = expandedTodoId
+    render()
+  } else if (e.target.classList.contains("cancel-update-todo-btn")) {
+    editingTodoId = null
     render()
   }
 }
 
-function handleTodoCheckboxClick(e) {
-  if (e.target.classList.contains("todo-complete-checkbox")) {
-    toggleTodoCompleteInCurrentProject(e.target.closest(".todo-card").dataset.todoId)
-    render()
+function handleEditTodoSubmit(e) {
+  if (!e.target.classList.contains("edit-todo-form")) {
+    return
   }
+
+  e.preventDefault()
+  const curTodoId = e.target.closest(".todo-card").dataset.todoId
+  const form = e.target
+  const formData = new FormData(form)
+  const title = formData.get("new-title")
+  const description = formData.get("new-description")
+  const dueDate = formData.get("new-due-date")
+  const priority = formData.get("new-priority")
+  updateTodoInCurrentProject(curTodoId, title, description, dueDate, priority)
+  editingTodoId = null
+  render()
 }
 
 export function render() {
@@ -148,8 +215,8 @@ export function initDOMEvents() {
   newTodoBtn.addEventListener("click", handleNewTodoClick)
   todosFormContainer.addEventListener("submit", handleFormSubmit)
   todosFormContainer.addEventListener("click", handleTodoFormCancel)
-  todosContainer.addEventListener("click", handleTodoDeleteClick)
-  todosContainer.addEventListener("click", handleTodoCheckboxClick)
+  todosContainer.addEventListener("click", handleTodoClick)
+  todosContainer.addEventListener("submit", handleEditTodoSubmit)
   newProjectBtn.addEventListener("click", handleNewProjectClick)
   projectFormContainer.addEventListener("submit", handleNewProjectFormSubmit)
   projectFormContainer.addEventListener("click", handleProjectFormCancel)
