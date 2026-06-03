@@ -1,3 +1,5 @@
+import Todo from "./Todo.js"
+
 export default class Project {
   constructor(name) {
     this.id = crypto.randomUUID()
@@ -23,10 +25,17 @@ export default class Project {
   }
 
   toggleTodoComplete(todoId) {
-    this.findTodo(todoId).toggleComplete()
+    this.findTodo(todoId)?.toggleComplete()
   }
 
   updateTodo(todoId, title, description, dueDate, priority) {
     this.findTodo(todoId)?.updateDetails(title, description, dueDate, priority)
+  }
+
+  static fromData(savedProject) {
+    const newProject = new Project(savedProject.name)
+    newProject.id = savedProject.id ? savedProject.id : crypto.randomUUID()
+    newProject.todos = savedProject.todos ? savedProject.todos.map(todo => Todo.fromData(todo)) : []
+    return newProject
   }
 }

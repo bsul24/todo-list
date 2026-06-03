@@ -18,4 +18,11 @@ export default class Todo {
     this.dueDate = dueDate
     this.priority = priority
   }
+
+  static fromData(savedTodo) {
+    const newTodo = new Todo(savedTodo.title, savedTodo.description, savedTodo.dueDate, savedTodo.priority)
+    newTodo.id = savedTodo.id
+    newTodo.completed = savedTodo.completed
+    return newTodo
+  }
 }
