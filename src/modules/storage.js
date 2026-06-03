@@ -8,7 +8,11 @@ export function loadProjects() {
   if (!projects || projects === "undefined") {
     return []
   }
-
-  const parsedProjects = JSON.parse(projects)
-  return parsedProjects ? parsedProjects : []
+  
+  try {
+    const parsedProjects = JSON.parse(projects)
+    return Array.isArray(parsedProjects) ? parsedProjects : []
+  } catch {
+    return []
+  }
 }
