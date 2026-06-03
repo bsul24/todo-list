@@ -1,4 +1,5 @@
 import { getProjects, getCurrentProject, setCurrentProject, addTodoToCurrentProject, deleteTodoFromCurrentProject, toggleTodoCompleteInCurrentProject, addProject, deleteProject, updateTodoInCurrentProject } from "./appController.js"
+import { format, parseISO, isBefore, startOfToday } from "date-fns"
 
 const projectsContainer = document.querySelector(".projects-container")
 const currentProjectTitle = document.querySelector(".cur-proj-title")
@@ -64,7 +65,7 @@ function renderTodos() {
       }" data-todo-id="${todo.id}">
         <h3 class="todo-title">${todo.title}</h3>
         ${expandedTodoId === todo.id ? `<p class="todo-description">${todo.description}</p>` : ""}
-        <p class="todo-due-date">${todo.dueDate}</p>
+        <p class="todo-due-date ${isOverdue(todo) ? "overdue" : ""}">${formatDueDate(todo.dueDate)}</p>
         <p class="todo-status">${todo.completed ? "Completed" : "In Progress"}</p> 
         <input class="todo-complete-checkbox" type="checkbox" aria-label="Mark todo complete" ${todo.completed ? "checked" : ""}>
         <button class="todo-details-btn" type="button">${todo.id === expandedTodoId ? "Hide Details" : "Details"}</button>
@@ -202,6 +203,22 @@ function handleEditTodoSubmit(e) {
   updateTodoInCurrentProject(curTodoId, title, description, dueDate, priority)
   editingTodoId = null
   render()
+}
+
+function formatDueDate(dueDate) {
+  if (!dueDate) {
+    return ""
+  }
+  const date = parseISO(dueDate)
+  return format(date, "MMM d, yyyy")
+}
+
+function isOverdue(todo) {
+  if (!todo.dueDate || todo.completed) {
+    return false
+  }
+
+  return isBefore(parseISO(todo.dueDate), startOfToday())
 }
 
 export function render() {

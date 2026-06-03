@@ -24,3 +24,7 @@ body {
 .high-priority {
   background-color: red;
 }
+
+.overdue {
+  color: purple;
+}
