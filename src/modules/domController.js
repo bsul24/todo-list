@@ -43,6 +43,15 @@ function renderCurrentProjectTitle() {
 
 function renderTodos() {
   const curProject = getCurrentProject()
+  if (curProject.todos.length === 0) {
+    todosContainer.innerHTML = `
+      <div class="empty-state">
+        <h3>No todos yet</h3>
+        <p>Create a todo to get started.</p>
+      </div>
+    `
+    return
+  }
   todosContainer.textContent = ""
   curProject.todos.forEach(todo => {
     const html = editingTodoId === todo.id ? 
@@ -72,7 +81,7 @@ function renderTodos() {
     `
       <div class="todo-card ${todo.priority === "low" ? "low-priority" : 
                               todo.priority === "medium" ? "medium-priority" : "high-priority"
-      }" data-todo-id="${todo.id}">
+      } ${todo.completed ? "completed" : ""}" data-todo-id="${todo.id}">
         <h3 class="todo-title">${todo.title}</h3>
         ${expandedTodoId === todo.id ? `<p class="todo-description">${todo.description}</p>` : ""}
         <p class="todo-due-date ${isOverdue(todo) ? "overdue" : ""}">${formatDueDate(todo.dueDate)}</p>
@@ -88,7 +97,7 @@ function renderTodos() {
           `<button class="delete-todo-btn" type="button">Delete</button>`
           : ""
         }
-        ${expandedTodoId === todo.id ? `<button class="edit-todo-btn" type="button">Edit</button>` : ""}
+        ${expandedTodoId === todo.id && confirmingDeleteTodoId !== todo.id ? `<button class="edit-todo-btn" type="button">Edit</button>` : ""}
       </div>
     `
     todosContainer.innerHTML += html

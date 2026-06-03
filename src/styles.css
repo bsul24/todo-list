@@ -201,6 +201,39 @@ form {
   margin-bottom: 1.25rem;
 }
 
+.confirm-delete-todo-text {
+  color: var(--danger);
+  font-weight: 800;
+  margin-top: 0.5rem;
+}
+
+.confirm-delete-todo-btn,
+.cancel-delete-todo-btn {
+  justify-self: start;
+  padding: 0.55rem 0.8rem;
+  border-radius: var(--radius-md);
+  font-weight: 800;
+  margin-top: 0.25rem;
+}
+
+.confirm-delete-todo-btn {
+  background-color: var(--danger);
+  color: white;
+}
+
+.confirm-delete-todo-btn:hover {
+  background-color: var(--danger-hover);
+}
+
+.cancel-delete-todo-btn {
+  background-color: #e5e7eb;
+  color: var(--text-main);
+}
+
+.cancel-delete-todo-btn:hover {
+  background-color: #d1d5db;
+}
+
 .new-project-form {
   display: grid;
   gap: 0.6rem;
@@ -211,6 +244,40 @@ form {
 
 .new-project-form label {
   color: var(--text-light);
+}
+
+.confirm-delete-project-text {
+  grid-column: 1 / -1;
+  color: #fecaca;
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 0 0.6rem;
+}
+
+.confirm-delete-project-btn,
+.cancel-delete-project-btn {
+  padding: 0.4rem 0.55rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.confirm-delete-project-btn {
+  background-color: var(--danger);
+  color: white;
+}
+
+.confirm-delete-project-btn:hover {
+  background-color: var(--danger-hover);
+}
+
+.cancel-delete-project-btn {
+  background-color: rgba(255, 255, 255, 0.14);
+  color: var(--text-light);
+}
+
+.cancel-delete-project-btn:hover {
+  background-color: rgba(255, 255, 255, 0.24);
 }
 
 label {
@@ -340,6 +407,20 @@ select:focus {
   opacity: 0.9;
 }
 
+.todo-card.completed {
+  opacity: 0.72;
+}
+
+.todo-card.completed .todo-title {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.todo-card.completed .todo-status {
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
 .todo-details-btn,
 .edit-todo-btn,
 .delete-todo-btn {
@@ -376,6 +457,20 @@ select:focus {
 .delete-todo-btn:hover {
   background-color: var(--danger);
   color: white;
+}
+
+.empty-state {
+  background-color: var(--bg-card);
+  border: 1px dashed #cbd5e1;
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.empty-state h3 {
+  color: var(--text-main);
+  margin-bottom: 0.35rem;
 }
 
 /* Edit form inside todo card */
