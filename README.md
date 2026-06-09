@@ -1,6 +1,6 @@
 # Todo List
 
-A responsive todo list app built for The Odin Project. Users can create projects, add todos, edit todo details, mark tasks complete, and organize todos by project.
+A responsive todo list app built with JavaScript, Webpack, and localStorage as part of The Odin Project curriculum. Users can create projects, add todos, edit todo details, mark tasks complete, and organize todos by project.
 
 The app stores projects and todos in `localStorage`, so changes persist after refreshing the page. It also uses `date-fns` to format due dates and highlight overdue tasks.
 
